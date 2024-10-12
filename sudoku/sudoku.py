@@ -1,4 +1,5 @@
 from sys import exit, argv
+import time
 
 
 def estContradictoire(liste):
@@ -20,7 +21,9 @@ def casePossibles(case, sudoku):
     chiffres |= {sudoku[i][case[1]] for i in range(9)}
     cellule = case[0] // 3, case[1] // 3
     for i in range(3):
-        chiffres |= set(sudoku[cellule[0] * 3 + i][cellule[1] * 3: (cellule[1] + 1) * 3])
+        chiffres |= set(
+            sudoku[cellule[0] * 3 + i][cellule[1] * 3 : (cellule[1] + 1) * 3]
+        )
     return list(set(range(1, 10)) - chiffres)
 
 
@@ -42,7 +45,11 @@ try:
             try:
                 line_items = [int(i) for i in list(ligne.strip())]
             except ValueError:
-                print("La ligne " + str(index + 1) + " contient autre chose qu'un chiffre.")
+                print(
+                    "La ligne "
+                    + str(index + 1)
+                    + " contient autre chose qu'un chiffre."
+                )
                 exit(1)
 
             # Check lenght
@@ -92,13 +99,23 @@ for cell_row_index in range(3):
             # Get cell column indexes
             cell_elem_column_index_start = cell_column_index * 3
             cell_elem_column_index_end = (cell_column_index + 1) * 3
-            
+
             # Add elements to cell
-            cell.extend(sudoku[cell_elem_row_index][cell_elem_column_index_start : cell_elem_column_index_end])
-        
+            cell.extend(
+                sudoku[cell_elem_row_index][
+                    cell_elem_column_index_start:cell_elem_column_index_end
+                ]
+            )
+
         # Check cell is correct
         if estContradictoire(cell):
-            print("La cellule (" + str(cell_row_index + 1) + " ; " + str(cell_column_index + 1) + ") est contradictoire.")
+            print(
+                "La cellule ("
+                + str(cell_row_index + 1)
+                + " ; "
+                + str(cell_column_index + 1)
+                + ") est contradictoire."
+            )
             exit(1)
 
 # Display initial grid
@@ -108,6 +125,9 @@ for line in sudoku:
     for element in line:
         elements = elements + str(element)
     print(elements)
+
+# Start tracking time
+start_time = time.time()
 
 # Resolution
 N_columns = len(sudoku[0])
@@ -144,3 +164,7 @@ for line in sudoku:
     for element in line:
         elements = elements + str(element)
     print(elements)
+
+# Execution time
+exec_time = time.time() - start_time
+print("\nExecution time :", exec_time)
