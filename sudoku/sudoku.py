@@ -27,6 +27,22 @@ def casePossibles(case, sudoku):
     return list(set(range(1, 10)) - chiffres)
 
 
+def get_min_gap(gaps, sudoku):
+    """
+    Get the index of gap with smallest number of possible values
+    """
+    min_len = 10
+    best_cell_index = 0
+
+    for index, gap in enumerate(gaps):
+        possibles_len = len(casePossibles(gap, sudoku))
+        if possibles_len < min_len and possibles_len != 0:
+            min_len = possibles_len
+            best_cell_index = index
+
+    return best_cell_index
+
+
 try:
     file = argv[1]
 except IndexError:
@@ -134,28 +150,18 @@ N_columns = len(sudoku[0])
 possibles = [[] for _ in range(N_rows * N_columns)]
 CUR_GAP_INDEX = 0
 
-# Iterate in gaps until all of them has correct value
-while CUR_GAP_INDEX < len(gaps):
-    gap = gaps[CUR_GAP_INDEX]
-    possibles[CUR_GAP_INDEX] = casePossibles(gap, sudoku)
 
-    # Do steps back until we have good value and sudoku
-    while len(possibles[CUR_GAP_INDEX]) == 0:
-        # Reset value
-        cell_row, cell_column = gaps[CUR_GAP_INDEX]
-        sudoku[cell_row][cell_column] = 0
-        CUR_GAP_INDEX -= 1
+while len(gaps) != 0:
+    gap_index = get_min_gap(gaps, sudoku)
+    gap = gaps[gap_index]
+    possibles[gap_index] = casePossibles(gap, sudoku)
 
-        # Stop loop if no correct solution possible
-        if CUR_GAP_INDEX < 0:
-            print("No solution!")
-            exit(0)
+    if len(possibles[gap_index]) == 0:
+        print("No solution!")
+        exit(0)
 
-    # Set iterativally possible values
-    cell_row, cell_column = gaps[CUR_GAP_INDEX]
-    sudoku[cell_row][cell_column] = possibles[CUR_GAP_INDEX].pop()
-    CUR_GAP_INDEX += 1
-
+    sudoku[gap[0]][gap[1]] = possibles[gap_index].pop()
+    gaps.remove(gap)
 
 # Display solved grid
 print("\nGrille resolue : ")
